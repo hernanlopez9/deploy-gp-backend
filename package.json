@@ -7,6 +7,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "dev": "bun  --watch src/index.ts",
     "build": "rimraf dist && tsc",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/index.js",
@@ -24,8 +25,7 @@
   },
   "dependencies": {
     "@prisma/adapter-mssql": "^7.4.2",
-    "@prisma/client": "^7.4.2",
-    "@prisma/orm-postgres": "^8.0.0-rc.1",
+    "@prisma/client": "^7.9.1",
     "cache-manager": "^6.4.3",
     "cors": "^2.8.5",
     "dotenv": "^17.4.2",
@@ -33,6 +33,7 @@
     "helmet": "^7.1.0",
     "joi": "^18.0.2",
     "morgan": "^1.10.0",
+    "pg": "^8.22.0",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
@@ -43,6 +44,7 @@
     "@types/jest": "^29.5.14",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.19.15",
+    "@types/pg": "^8.21.0",
     "@types/supertest": "^6.0.2",
     "@types/swagger-ui-express": "^4.1.6",
     "eslint": "^9.18.0",
@@ -51,7 +53,7 @@
     "globals": "^16.0.0",
     "jest": "^29.7.0",
     "prettier": "^3.4.2",
-    "prisma": "^7.4.2",
+    "prisma": "^7.9.1",
     "prisma-next": "^8.0.0-rc.1",
     "rimraf": "^5.0.5",
     "source-map-support": "^0.5.21",
