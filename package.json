@@ -7,7 +7,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "bun  --watch src/index.ts",
+    "dev": "bun  --watch src/main.ts",
     "build": "rimraf dist && tsc",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/index.js",
@@ -26,7 +26,9 @@
   "dependencies": {
     "@prisma/adapter-mssql": "^7.4.2",
     "@prisma/client": "^7.9.1",
+    "@types/cookie-parser": "^1.4.10",
     "cache-manager": "^6.4.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.4.2",
     "express": "^4.19.2",

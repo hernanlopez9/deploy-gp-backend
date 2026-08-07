@@ -9,4 +9,5 @@ export const OPTIONAL_VARS = [
   'API_KEY',
   'CORS_ORIGIN',
   'NODE_ENV',
+  'DIRECT_URL',
 ] as const;
