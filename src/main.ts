@@ -15,6 +15,7 @@ function bootstrap(): Server {
     process.exit(1);
   }
 }
+bootstrap();
 
 // function shutdown(signal: string) {
 //   console.info(`\n🛑 Señal ${signal} recibida, cerrando servidor...`);
@@ -46,5 +47,3 @@ function bootstrap(): Server {
 //   console.error('💥 Excepción no capturada:', error);
 //   process.exit(1);
 // });
-
-bootstrap();

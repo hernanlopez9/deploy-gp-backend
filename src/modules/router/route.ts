@@ -2,6 +2,7 @@ import type { Request, Response, Application, RequestHandler } from 'express';
 import packageData from '../../../package.json';
 import { createCorsMiddleware } from '../../shared/config/cors.config';
 import { config } from '../../shared/config/config';
+import { authRoutes } from '../auth';
 
 // import { Router } from 'express';
 // const router = Router();
@@ -42,6 +43,7 @@ export function setupRoutes(
   });
 
   // ✅ Ahora sí apuntará a la carpeta correcta
+  app.use('/api/auth', authRoutes);
 
   app.use((req: Request, res: Response) => {
     res.status(404).json({

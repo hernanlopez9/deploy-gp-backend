@@ -3,13 +3,13 @@ import { OPTIONAL_VARS, REQUIRED_VARS } from '../valueObjects';
 // import { OPTIONAL_VARS, REQUIRED_VARS } from '@/domain/valueObjects';
 // ! ─── Variables requeridas (la app no arranca sin estas) ───────────────────────
 
-const missing = REQUIRED_VARS.filter((key) => !process.env[key]);
+const missing = REQUIRED_VARS.filter((key: string) => !process.env[key]);
 // lo que verica es que faltan las variables requeridas
 if (missing.length > 0) {
   console.error('\n\x1b[31m╔══════════════════════════════════════════════╗');
   console.error('║   ❌  VARIABLES DE ENTORNO FALTANTES         ║');
   console.error('╠══════════════════════════════════════════════╣');
-  missing.forEach((key) => {
+  missing.forEach((key: string) => {
     console.error(`║   • ${key.padEnd(42)}║`);
   });
   console.error('╠══════════════════════════════════════════════╣');

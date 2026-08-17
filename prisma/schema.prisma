@@ -249,7 +249,7 @@ model Document {
   rowguid         String                     @unique(map: "AK_Document_rowguid") @default(dbgenerated("newid()"), map: "DF_Document_rowguid") @db.UniqueIdentifier
   ModifiedDate    DateTime                   @default(now(), map: "DF_Document_ModifiedDate") @db.DateTime
   Employee        Employee                   @relation(fields: [Owner], references: [BusinessEntityID], onUpdate: NoAction, map: "FK_Document_Employee_Owner")
-  ProductDocument ProductDocument[]          @ignore
+  ProductDocument ProductDocument[]  @ignore
 
   @@unique([DocumentLevel, DocumentNode], map: "AK_Document_DocumentLevel_DocumentNode")
   @@index([FileName, Revision], map: "IX_Document_FileName_Revision")
@@ -478,7 +478,7 @@ model Product {
   UnitMeasure_Product_SizeUnitMeasureCodeToUnitMeasure       UnitMeasure?              @relation("Product_SizeUnitMeasureCodeToUnitMeasure", fields: [SizeUnitMeasureCode], references: [UnitMeasureCode], onDelete: NoAction, onUpdate: NoAction, map: "FK_Product_UnitMeasure_SizeUnitMeasureCode")
   UnitMeasure_Product_WeightUnitMeasureCodeToUnitMeasure     UnitMeasure?              @relation("Product_WeightUnitMeasureCodeToUnitMeasure", fields: [WeightUnitMeasureCode], references: [UnitMeasureCode], onDelete: NoAction, onUpdate: NoAction, map: "FK_Product_UnitMeasure_WeightUnitMeasureCode")
   ProductCostHistory                                         ProductCostHistory[]
-  ProductDocument                                            ProductDocument[]         @ignore
+  ProductDocument                                            ProductDocument[] @ignore
   ProductInventory                                           ProductInventory[]
   ProductListPriceHistory                                    ProductListPriceHistory[]
   ProductProductPhoto                                        ProductProductPhoto[]
@@ -1096,4 +1096,15 @@ model WorkOrderRouting {
   @@id([WorkOrderID, ProductID, OperationSequence], map: "PK_WorkOrderRouting_WorkOrderID_ProductID_OperationSequence")
   @@index([ProductID], map: "IX_WorkOrderRouting_ProductID")
   @@schema("Production")
+}
+
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @db.VarChar(50)
+  email     String   @unique @db.VarChar(100)
+  password  String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+
+  @@schema("dbo")
 }
