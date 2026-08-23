@@ -3,7 +3,7 @@ import packageData from '../../../package.json';
 import { createCorsMiddleware } from '../../shared/config/cors.config';
 import { config } from '../../shared/config/config';
 import { authRoutes } from '../auth';
-
+import { dashboardRoutes } from '../dashboard';
 // import { Router } from 'express';
 // const router = Router();
 // funciones para configurar las rutas de la api, como el health check, la documentación, etc.
@@ -44,7 +44,7 @@ export function setupRoutes(
 
   // ✅ Ahora sí apuntará a la carpeta correcta
   app.use('/api/auth', authRoutes);
-
+  app.use('/api/dashboard', dashboardRoutes);
   app.use((req: Request, res: Response) => {
     res.status(404).json({
       error: 'Not Found',
