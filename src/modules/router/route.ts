@@ -5,6 +5,7 @@ import { config } from '../../shared/config/config';
 import { authRoutes } from '../auth';
 import { dashboardRoutes } from '../dashboard';
 import { clientsRouter } from '../clients';
+import ProductosRouter from '../products/routes/products.routes';
 // import { Router } from 'express';
 // const router = Router();
 // funciones para configurar las rutas de la api, como el health check, la documentación, etc.
@@ -47,6 +48,7 @@ export function setupRoutes(
   app.use('/api/auth', authRoutes);
   app.use('/api/dashboard', dashboardRoutes);
   app.use('/api/clients', clientsRouter);
+  app.use('/api/products', ProductosRouter);
   app.use((req: Request, res: Response) => {
     res.status(404).json({
       error: 'Not Found',

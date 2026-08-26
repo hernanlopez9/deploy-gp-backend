@@ -197,10 +197,9 @@ export class DashboardService {
 
   // --- Métodos Privados de Ayuda ---
 
-private resolveRanges(filter: DashboardFilter) {
-    
-    const today = new Date('2014-06-30T00:00:00.000Z'); 
-    
+  private resolveRanges(filter: DashboardFilter) {
+    const today = new Date('2014-06-30T00:00:00.000Z');
+
     const fromInput = filter.from ? this.parseDate(filter.from) : null;
     const toInput = filter.to ? this.parseDate(filter.to) : null;
 
