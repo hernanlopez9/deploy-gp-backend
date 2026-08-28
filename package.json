@@ -21,7 +21,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "ok": "bun run format && bun run build && git add .",
-    "contract:emit": "prisma-next contract emit"
+    "contract:emit": "prisma-next contract emit",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-mssql": "^7.4.2",
