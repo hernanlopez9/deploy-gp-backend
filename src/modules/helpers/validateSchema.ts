@@ -21,9 +21,9 @@ export const validate = (
       next();
     } catch (error: unknown) {
       // 4. Manejo limpio de errores de Zod
-      if (error instanceof Error && 'errors' in (error as any)) {
+      if (error instanceof Error && 'issues' in (error as any)) {
         const zodError = error as ZodError;
-        const messages = zodError.errors
+        const messages = zodError.issues
           .map((e) => `${e.path.join('.')}: ${e.message}`)
           .join(', ');
         next(new AppError(messages, 400));
