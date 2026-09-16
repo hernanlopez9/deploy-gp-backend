@@ -72,7 +72,7 @@ export class SalesService {
       prisma.salesOrderHeader.count({ where }),
     ]);
 
-    const data: SalesOrderListItem[] = orders.map((order) => ({
+    const data: SalesOrderListItem[] = orders.map((order: any) => ({
       SalesOrderID: order.SalesOrderID,
       SalesOrderNumber: order.SalesOrderNumber,
       OrderDate: order.OrderDate,
@@ -146,42 +146,38 @@ export class SalesService {
 
     if (!order) return null;
 
-    return {
-      SalesOrderID: order.SalesOrderID,
-      SalesOrderNumber: order.SalesOrderNumber,
-      OrderDate: order.OrderDate,
-      DueDate: order.DueDate,
-      TotalDue: Number(order.TotalDue),
-      Status: order.Status,
-      SubTotal: Number(order.SubTotal),
-      TaxAmt: Number(order.TaxAmt),
-      Freight: Number(order.Freight),
-      CustomerName: order.Customer?.Person
-        ? `${order.Customer.Person.FirstName} ${order.Customer.Person.LastName}`.trim()
-        : 'Walk-in Customer',
-      SalesPersonName: order.SalesPerson?.Employee?.Person
-        ? `${order.SalesPerson.Employee.Person.FirstName} ${order.SalesPerson.Employee.Person.LastName}`.trim()
-        : null,
-      TerritoryName: order.SalesTerritory?.Name || null,
-      details: order.SalesOrderDetail.map((d) => {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-        const productName = (d as any)?.Product?.Name ?? '';
+    const typedOrder = order as any;
 
-        return {
-          SalesOrderDetailID: d.SalesOrderDetailID,
-          ProductID: d.ProductID,
-          ProductName: productName,
-          OrderQty: d.OrderQty,
-          UnitPrice: Number(d.UnitPrice),
-          UnitPriceDiscount: Number(d.UnitPriceDiscount),
-          LineTotal: Number(d.LineTotal),
-        };
-      }),
+    return {
+      SalesOrderID: typedOrder.SalesOrderID,
+      SalesOrderNumber: typedOrder.SalesOrderNumber,
+      OrderDate: typedOrder.OrderDate,
+      DueDate: typedOrder.DueDate,
+      TotalDue: Number(typedOrder.TotalDue),
+      Status: typedOrder.Status,
+      SubTotal: Number(typedOrder.SubTotal),
+      TaxAmt: Number(typedOrder.TaxAmt),
+      Freight: Number(typedOrder.Freight),
+      CustomerName: typedOrder.Customer?.Person
+        ? `${typedOrder.Customer.Person.FirstName} ${typedOrder.Customer.Person.LastName}`.trim()
+        : 'Walk-in Customer',
+      SalesPersonName: typedOrder.SalesPerson?.Employee?.Person
+        ? `${typedOrder.SalesPerson.Employee.Person.FirstName} ${typedOrder.SalesPerson.Employee.Person.LastName}`.trim()
+        : null,
+      TerritoryName: typedOrder.SalesTerritory?.Name || null,
+      details: (typedOrder.SalesOrderDetail || []).map((d: any) => ({
+        SalesOrderDetailID: d.SalesOrderDetailID,
+        ProductID: d.ProductID,
+        ProductName: d.Product?.Name ?? '',
+        OrderQty: d.OrderQty,
+        UnitPrice: Number(d.UnitPrice),
+        UnitPriceDiscount: Number(d.UnitPriceDiscount),
+        LineTotal: Number(d.LineTotal),
+      })),
     };
   }
 
   async create(data: CreateSalesOrderDto) {
-    // 1. Obtener precios de los productos para calcular totales
     const productIds = data.items.map((i) => i.productID);
     const products = await prisma.product.findMany({
       where: { ProductID: { in: productIds } },
@@ -191,7 +187,7 @@ export class SalesService {
 
     let subTotal = 0;
     const detailsPayload = data.items.map((item) => {
-      const price = priceMap.get(item.productID) || 0;
+      const price = Number(priceMap.get(item.productID) || 0);
       const discount = item.unitPriceDiscount || 0;
       const lineTotal = item.orderQty * price * (1 - discount);
       subTotal += lineTotal;
@@ -199,14 +195,13 @@ export class SalesService {
       return {
         ProductID: item.productID,
         OrderQty: item.orderQty,
-        SpecialOfferID: item.specialOfferID || 1, // 1 = "No Discount" en AdventureWorks
+        SpecialOfferID: item.specialOfferID || 1,
         UnitPrice: price,
         UnitPriceDiscount: discount,
         LineTotal: lineTotal,
       };
     });
 
-    // 2. Transacción atómica: Crear cabecera y detalles simultáneamente
     const newOrder = await prisma.$transaction(async (tx) => {
       return tx.salesOrderHeader.create({
         data: {
@@ -219,10 +214,10 @@ export class SalesService {
           TerritoryID: data.territoryID,
           CreditCardID: data.creditCardID,
           OrderDate: new Date(),
-          DueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // +14 días por defecto
-          Status: 1, // 1 = "In process"
+          DueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+          Status: 1,
           SubTotal: subTotal,
-          TaxAmt: 0, // Simplificado (podrías calcularlo con SalesTaxRate si lo requieres)
+          TaxAmt: 0,
           Freight: 0,
           TotalDue: subTotal,
           SalesOrderDetail: { create: detailsPayload },
@@ -231,7 +226,6 @@ export class SalesService {
       });
     });
 
-    // 3. Invalidar caché inmediatamente
     this.bumpSalesCacheVersion();
 
     return newOrder;
