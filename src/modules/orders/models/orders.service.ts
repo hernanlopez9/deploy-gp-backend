@@ -11,15 +11,8 @@ export class OrdersService {
     startDate?: string;
     endDate?: string;
   }) {
-    const {
-      page,
-      limit,
-      customerId,
-      territoryId,
-      status,
-      startDate,
-      endDate,
-    } = filter;
+    const { page, limit, customerId, territoryId, status, startDate, endDate } =
+      filter;
 
     const where: any = {};
 
@@ -118,10 +111,7 @@ export class OrdersService {
 
     // Crear un mapa de precios
     const priceMap = new Map(
-      products.map((product) => [
-        product.ProductID,
-        product.ListPrice,
-      ]),
+      products.map((product) => [product.ProductID, product.ListPrice]),
     );
 
     let subTotal = 0;
@@ -134,8 +124,7 @@ export class OrdersService {
 
       const specialOfferID = item.specialOfferID ?? 1;
 
-      const lineTotal =
-        item.orderQty * price * (1 - discount);
+      const lineTotal = item.orderQty * price * (1 - discount);
 
       subTotal += lineTotal;
 
@@ -166,9 +155,7 @@ export class OrdersService {
 
           OrderDate: new Date(),
 
-          DueDate: new Date(
-            Date.now() + 14 * 24 * 60 * 60 * 1000,
-          ),
+          DueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
 
           Status: 1,
 

@@ -1,40 +1,69 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { ZodSchema, ZodError } from 'zod';
-import { AppError } from '../../shared/errors/app-error.js'; // Ajusta la ruta a tu AppError
+import { AppError } from '../../shared/errors/app-error.js';
 
 export const validate = (
-  schema: ZodSchema,
+  // ✅ Aceptamos cualquier schema (Joi o Zod)
+  schema: any,
   source: 'body' | 'query' | 'params' = 'body',
 ) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      // 1. Tomamos los datos de la fuente correcta (query, body o params)
       const dataToValidate = req[source];
 
-      // 2. Validamos con Zod (esto aplica los valores por defecto como page: 1)
-      const validatedData = schema.parse(dataToValidate);
+      let validatedData: any;
 
-      // 3. Lo guardamos en req.validatedQuery, req.validatedBody, etc.
+      // 🔍 Detectamos si es un schema de Joi
+      if (schema && typeof schema.validate === 'function') {
+        const { error, value } = schema.validate(dataToValidate, {
+          abortEarly: false,
+          stripUnknown: true,
+          convert: true, // ← importante para que "10" (string) se convierta a 10 (número)
+        });
+
+        if (error) {
+          const messages = error.details
+            .map((d: any) => `${d.path.join('.')}: ${d.message}`)
+            .join(', ');
+          return next(new AppError(messages, 400));
+        }
+
+        validatedData = value;
+      }
+      // 🔍 Detectamos si es un schema de Zod
+      else if (schema && typeof schema.parse === 'function') {
+        validatedData = schema.parse(dataToValidate);
+      }
+      // ❌ Ni Joi ni Zod → error claro
+      else {
+        return next(
+          new AppError(
+            'Schema inválido: no tiene ni .validate() (Joi) ni .parse() (Zod)',
+            500,
+          ),
+        );
+      }
+
+      // Guardamos los datos validados (req.validatedQuery, req.validatedBody, etc.)
       const key = `validated${source.charAt(0).toUpperCase() + source.slice(1)}`;
       (req as any)[key] = validatedData;
 
       next();
     } catch (error: unknown) {
-      // 4. Manejo limpio de errores de Zod
+      // Manejo de errores de Zod
       if (error instanceof Error && 'issues' in (error as any)) {
-        const zodError = error as ZodError;
-        const messages = zodError.issues
-          .map((e) => `${e.path.join('.')}: ${e.message}`)
+        const messages = (error as any).issues
+          .map((e: any) => `${e.path.join('.')}: ${e.message}`)
           .join(', ');
-        next(new AppError(messages, 400));
-      } else {
-        next(
-          new AppError(
-            error instanceof Error ? error.message : 'Error de validación',
-            400,
-          ),
-        );
+        return next(new AppError(messages, 400));
       }
+
+      // Manejo genérico
+      next(
+        new AppError(
+          error instanceof Error ? error.message : 'Error de validación',
+          400,
+        ),
+      );
     }
   };
 };

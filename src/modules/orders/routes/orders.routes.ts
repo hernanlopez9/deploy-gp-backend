@@ -21,7 +21,6 @@ router.get(
   ordersController.findAll,
 );
 
-
 // Obtener una orden específica
 router.get(
   '/:id',
@@ -29,7 +28,6 @@ router.get(
   // eslint-disable-next-line @typescript-eslint/unbound-method
   ordersController.findById,
 );
-
 
 // Crear una nueva orden
 router.post(
@@ -39,7 +37,6 @@ router.post(
   ordersController.create,
 );
 
-
 // Actualizar una orden
 router.patch(
   '/:id',
@@ -48,7 +45,6 @@ router.patch(
   // eslint-disable-next-line @typescript-eslint/unbound-method
   ordersController.update,
 );
-
 
 // Eliminar una orden
 router.delete(

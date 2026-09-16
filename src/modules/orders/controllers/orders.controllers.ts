@@ -12,20 +12,16 @@ export class OrdersController {
           ? Number(req.query.customerId)
           : undefined,
 
-        status: req.query.status
-          ? Number(req.query.status)
-          : undefined,
+        status: req.query.status ? Number(req.query.status) : undefined,
       };
 
       const result = await ordersService.findAll(filter);
 
-      res
-        .status(200)
-        .json({
-          success: true,
-          data: result.data,
-          meta: result.meta,
-        });
+      res.status(200).json({
+        success: true,
+        data: result.data,
+        meta: result.meta,
+      });
     } catch (error) {
       next(error);
     }
