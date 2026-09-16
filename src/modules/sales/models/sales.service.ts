@@ -138,7 +138,6 @@ export class SalesService {
             UnitPrice: true,
             UnitPriceDiscount: true,
             LineTotal: true,
-            Product: { select: { Name: true } },
           },
         },
       },
