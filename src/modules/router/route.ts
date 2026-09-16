@@ -7,6 +7,7 @@ import { dashboardRoutes } from '../dashboard';
 import { clientsRouter } from '../clients';
 import SalesRouter from '../sales/routes/sales.routes';
 import ProductosRouter from '../products/routes/products.routes';
+import OrdersRouter from '../orders/routes/orders.routes';
 // import { Router } from 'express';
 // const router = Router();
 // funciones para configurar las rutas de la api, como el health check, la documentación, etc.
@@ -51,6 +52,7 @@ export function setupRoutes(
   app.use('/api/clients', clientsRouter);
   app.use('/api/products', ProductosRouter);
   app.use('/api/sales', SalesRouter);
+  app.use('/api/orders', OrdersRouter);
   app.use((req: Request, res: Response) => {
     res.status(404).json({
       error: 'Not Found',
