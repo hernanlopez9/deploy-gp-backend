@@ -11,13 +11,18 @@ const router = Router();
 // GET /products/options
 router.get(
   '/options',
-  validate(productOptionsQuerySchema),
+  validate(productOptionsQuerySchema as any),
   // eslint-disable-next-line @typescript-eslint/unbound-method
   productsController.getOptions,
 );
 
 // GET /products
 // eslint-disable-next-line @typescript-eslint/unbound-method
-router.get('/', validate(productFilterSchema), productsController.findAll);
+router.get(
+  '/',
+  validate(productFilterSchema as any),
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  productsController.findAll,
+);
 
 export default router;

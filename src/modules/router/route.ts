@@ -5,6 +5,7 @@ import { config } from '../../shared/config/config';
 import { authRoutes } from '../auth';
 import { dashboardRoutes } from '../dashboard';
 import { clientsRouter } from '../clients';
+import SalesRouter from '../sales/routes/sales.routes';
 import ProductosRouter from '../products/routes/products.routes';
 // import { Router } from 'express';
 // const router = Router();
@@ -31,10 +32,10 @@ export function setupRoutes(
 
   app.get('/health', (req: Request, res: Response) => {
     res.json({
-      name: packageData.name || 'back-end-pulso',
+      name: packageData.name || 'back-end-adventurewords',
       version: packageData.version || '1.0.0',
       description:
-        packageData.description || 'Backend para el sistema de Pulso',
+        packageData.description || 'Backend para el sistema de adventurewords',
       node_version: process.version,
       environment: config.env || 'development',
       uptime: Math.floor(process.uptime()),
@@ -49,6 +50,7 @@ export function setupRoutes(
   app.use('/api/dashboard', dashboardRoutes);
   app.use('/api/clients', clientsRouter);
   app.use('/api/products', ProductosRouter);
+  app.use('/api/sales', SalesRouter);
   app.use((req: Request, res: Response) => {
     res.status(404).json({
       error: 'Not Found',

@@ -1,33 +1,40 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { ObjectSchema } from 'joi';
-import { AppError } from '../../shared/errors/app-error.js';
+import type { ZodSchema, ZodError } from 'zod';
+import { AppError } from '../../shared/errors/app-error.js'; // Ajusta la ruta a tu AppError
 
-export const validate = (schema: ObjectSchema) => {
+export const validate = (
+  schema: ZodSchema,
+  source: 'body' | 'query' | 'params' = 'body',
+) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const { error, value } = schema.validate(req.query, {
-      abortEarly: false,
-      stripUnknown: true,
-    });
+    try {
+      // 1. Tomamos los datos de la fuente correcta (query, body o params)
+      const dataToValidate = req[source];
 
-    if (error) {
-      const errorMessage = error.details
-        .map((detail) => detail.message)
-        .join(', ');
-      return next(AppError.badRequest(errorMessage));
+      // 2. Validamos con Zod (esto aplica los valores por defecto como page: 1)
+      const validatedData = schema.parse(dataToValidate);
+
+      // 3. Lo guardamos en req.validatedQuery, req.validatedBody, etc.
+      const key = `validated${source.charAt(0).toUpperCase() + source.slice(1)}`;
+      (req as any)[key] = validatedData;
+
+      next();
+    } catch (error: unknown) {
+      // 4. Manejo limpio de errores de Zod
+      if (error instanceof Error && 'issues' in (error as any)) {
+        const zodError = error as ZodError;
+        const messages = zodError.issues
+          .map((e) => `${e.path.join('.')}: ${e.message}`)
+          .join(', ');
+        next(new AppError(messages, 400));
+      } else {
+        next(
+          new AppError(
+            error instanceof Error ? error.message : 'Error de validación',
+            400,
+          ),
+        );
+      }
     }
-
-    // Adjuntamos los datos limpios y tipados al request
-    req.validatedQuery = value;
-    next();
   };
 };
-
-// Extensión de tipos de Express para incluir validatedQuery
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace Express {
-    interface Request {
-      validatedQuery?: any;
-    }
-  }
-}
